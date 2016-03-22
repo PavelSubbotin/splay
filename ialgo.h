@@ -1,10 +1,12 @@
 #pragma once
 
-#include <vector>
 #include <numeric>
-#include "splaytree.h"
+#include <vector>
+#include <algorithm>
+#include "splay.h"
 
 using std::vector;
+
 
 class IAlgo {
 public:
@@ -14,18 +16,17 @@ public:
 	virtual void addingOnSegment(int, int, int) = 0;
 	virtual void reverse(int, int) = 0;
 	virtual void nextPermutation(int, int) = 0;
-	virtual size_t size() = 0;
 };
 
-class GoodRealization : public IAlgo {
+class UnRandomTree : public IAlgo {
 private:
 	SplayTree *root_;
 public:
-	GoodRealization() :
+	UnRandomTree() :
 		root_(NULL)
 	{}
 
-	GoodRealization(SplayTree *root) :
+	UnRandomTree(SplayTree *root) :
 		root_(root)
 	{}
 
@@ -42,7 +43,7 @@ public:
 	}
 
 	void addingOnSegment(int left, int right, int element) {
-		root_ = root_->changeSegment(root_, left, right, element);
+		root_ = root_->addingOnSegment(root_, left, right, element);
 	}
 
 	void reverse(int left, int right) {
@@ -53,9 +54,8 @@ public:
 		root_ = root_->nextPermutation(root_, left, right);
 	}
 
-	size_t size()
-	{
-		return root_->getSize(root_);
+	void write() {
+		root_->write(root_);
 	}
 };
 
@@ -63,11 +63,11 @@ class SimpleRealization : public IAlgo {
 private:
 	vector <int> tmp;
 public:
-	void insert(int element ,int position) {
+	void insert(int position, int element) {
 		tmp.insert(tmp.begin() + position, element);
 	}
 
-	void changeElement(int element, int position) {
+	void changeElement(int position, int element) {
 		tmp[position] = element;
 	}
 
@@ -75,7 +75,7 @@ public:
 		return std::accumulate(tmp.begin() + left, tmp.begin() + right + 1, (int)0);
 	}
 
-	void addingOnSegment(int element, int left, int right) {
+	void addingOnSegment(int left, int right, int element) {
 		std::transform(tmp.begin() + left, tmp.begin() + right + 1,
 			tmp.begin() + left,
 			[element](int elem) {
@@ -89,9 +89,5 @@ public:
 
 	void nextPermutation(int left, int right) {
 		next_permutation(tmp.begin() + left, tmp.begin() + right + 1);
-	}
-	size_t size()
-	{
-		return tmp.size();
 	}
 };
